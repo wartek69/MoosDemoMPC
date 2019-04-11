@@ -30,7 +30,7 @@ ProcessConfig = ANTLER
   Run = pNodeReporter   @ NewConsole = false
 
   Run = ./plotter.py    @ NewConsole = false
-  Run = ./ping.py       @ NewConsole = false
+  Run = ./path_publisher.py       @ NewConsole = false
   Run = ./vessel_sim.py @ NewConsole = false
 
 
@@ -42,7 +42,7 @@ ProcessConfig = plotter.py
 {
 }
 
-ProcessConfig = ping.py
+ProcessConfig = path_publisher.py
 {
 }
 

@@ -64,12 +64,12 @@ class MoosPub(pymoos.comms):
 
 
 def main():
-    vessel = Vessel(0, -20, 0, 180, 1, 1, 180, -180)
+    vessel = Vessel(0, -20, 0, 180, 1, 0.1, 180, -180)
     pinger = MoosPub('localhost', 9000)
 
     while True:
-        time.sleep(1)
-        vessel.simulate(180)
+        time.sleep(0.1)
+        vessel.simulate(0)
         print('Vessel moved!')
         pinger.notify('NAV_X', vessel.x, -1);
         pinger.notify('NAV_Y', vessel.y, -1);

@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 from pymoos import pymoos
+from scipy.interpolate import CubicSpline
 import time
 
 class pingMOOS(pymoos.comms):
@@ -19,15 +20,32 @@ class pingMOOS(pymoos.comms):
               "under the name ", self.name)
         return True
 
+def create_path(length):
+    px = []
+    py = []
+    #x = [0, 500, 2000, 4000, 6000]
+    #y = [-1500, -800, -1800, 2000, -500]
+    x = [0, 20, 80, 100, 200]
+    y = [-100, -80, -60, -80, -100]
+
+    cs = CubicSpline(x, y)
+    for k in range(length):
+        px.append(k)
+        py.append(cs(k))
+    return px, py
 
 
 def main():
     pinger = pingMOOS('localhost', 9000)
-
-    while True:
+    px, py = create_path(4001)
+    j = 0;
+    while j < 10:
         time.sleep(1)
-        pinger.notify('DESIRED_THRUST', 50, -1);
-        pinger.notify('DESIRED_RUDDER', -50, -1);
+        j = j + 1
+        for i in range(len(px)):
+            coords = '{},{}'.format(px[i], py[i])
+            print(coords)
+            pinger.notify('VIEW_POINT', coords, -1);
 
 if __name__ == "__main__":
     main()
