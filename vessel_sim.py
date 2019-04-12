@@ -70,7 +70,6 @@ def main():
     while True:
         time.sleep(0.1)
         vessel.simulate(0)
-        print('Vessel moved!')
         pinger.notify('NAV_X', vessel.x, -1);
         pinger.notify('NAV_Y', vessel.y, -1);
         pinger.notify('NAV_SPEED', vessel.speed, -1);

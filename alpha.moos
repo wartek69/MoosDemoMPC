@@ -25,13 +25,15 @@ ProcessConfig = ANTLER
 
   Run = MOOSDB          @ NewConsole = false
   // Run = pLogger         @ NewConsole = false
-  Run = pMarineViewer   @ NewConsole = false, ExtraProcessParams=one
-  Run = uProcessWatch   @ NewConsole = false
-  Run = pNodeReporter   @ NewConsole = false
+  //Run = pMarineViewer   @ NewConsole = false, ExtraProcessParams=one
+  //Run = uProcessWatch   @ NewConsole = false
+  //Run = pNodeReporter   @ NewConsole = false
+  Run = ./mpc.py       @ NewConsole = false
 
-  Run = ./plotter.py    @ NewConsole = false
+  //Run = ./plotter.py    @ NewConsole = false
   Run = ./path_publisher.py       @ NewConsole = false
   Run = ./vessel_sim.py @ NewConsole = false
+
 
 
 
@@ -39,6 +41,10 @@ ProcessConfig = ANTLER
 }
 
 ProcessConfig = plotter.py
+{
+}
+
+ProcessConfig = mpc.py
 {
 }
 

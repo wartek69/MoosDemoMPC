@@ -18,6 +18,8 @@ class pingMOOS(pymoos.comms):
         """OnConnect callback"""
         print("Connected to", self.server, self.port,
               "under the name ", self.name)
+        self.register('PATH_X', 0)
+        self.register('PATH_Y', 0)
         return True
 
 def create_path(length):
@@ -38,13 +40,16 @@ def create_path(length):
 def main():
     pinger = pingMOOS('localhost', 9000)
     px, py = create_path(4001)
+    time.sleep(1)
+    pinger.notify('PATH_X', str(px), -1)
+    pinger.notify('PATH_Y', str(py), -1)
     j = 0;
     while j < 10:
         time.sleep(1)
+
         j = j + 1
         for i in range(len(px)):
             coords = '{},{}'.format(px[i], py[i])
-            print(coords)
             pinger.notify('VIEW_POINT', coords, -1);
 
 if __name__ == "__main__":
