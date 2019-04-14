@@ -105,7 +105,7 @@ ProcessConfig = pMarineViewer
 
   tiff_file            = forrest19.tif
 
-  set_pan_x            = 800
+  set_pan_x            = -3000
   set_pan_y            = 6000
   zoom                 = 0.04
   vehicle_shape_scale  = 50

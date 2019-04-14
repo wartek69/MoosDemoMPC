@@ -103,7 +103,7 @@ def main():
     vesselMoos.notify('VESSEL_STATE', states, -1);
 
     while True:
-        time.sleep(0.1)
+        time.sleep(0.01)
         vesselMoos.lock.acquire()
         try:
             vesselMoos.notify('NAV_X', vesselMoos.vessel.x, -1);

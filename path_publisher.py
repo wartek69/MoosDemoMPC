@@ -54,14 +54,11 @@ def main():
     time.sleep(1)
     pinger.notify('PATH_X', str(px), -1)
     pinger.notify('PATH_Y', str(py), -1)
-    j = 0;
-    while j < 20:
-        time.sleep(1)
 
-        j = j + 1
-        for i in range(len(px)):
-            coords = '{},{}'.format(px[i], py[i])
-            pinger.notify('VIEW_POINT', coords, -1);
+    for i in range(len(px)):
+        coords = '{},{}'.format(px[i], py[i])
+        time.sleep(0.0001)
+        pinger.notify('VIEW_POINT', coords, -1);
 
 if __name__ == "__main__":
     main()
