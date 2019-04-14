@@ -2,11 +2,13 @@
 from pymoos import pymoos
 import time
 import math
+import threading
+
 
 secondsPerMin = 60
 
 
-class Vessel(pymoos.comms):
+class Vessel():
     # x and y in meters!
     # speed m/s
     # rot_change in degree/s/s
@@ -44,13 +46,18 @@ class Vessel(pymoos.comms):
         else:
             self.rot = self.rot
 
-class MoosPub(pymoos.comms):
+class VesselMoosPub(pymoos.comms):
     def __init__(self, moos_community, moos_port):
         """Initiates MOOSComms, sets the callbacks and runs the loop"""
-        super(MoosPub, self).__init__()
+        self.vessel = Vessel(-500, -1600, 0, 0, 1, 0.1, 180, -180)
+        super(VesselMoosPub, self).__init__()
         self.server = moos_community
         self.port = moos_port
-        self.name = 'MoosPub'
+        self.name = 'VesselMoosPub'
+
+        self.lock = threading.Lock()
+        self.add_active_queue('rrot_queue', self.__on_vessel_rrot)
+        self.add_message_route_to_active_queue('rrot_queue', 'RROT')
 
         self.set_on_connect_callback(self.__on_connect)
         self.run(self.server, self.port, self.name)
@@ -59,22 +66,60 @@ class MoosPub(pymoos.comms):
         """OnConnect callback"""
         print("Connected to", self.server, self.port,
               "under the name ", self.name)
+        self.register('RROT', 0)
+
+
+        return True
+
+    def __on_vessel_rrot(self, msg):
+        self.lock.acquire()
+        print('new control action received')
+        try:
+            if msg.key() == 'RROT':
+                self.vessel.simulate(msg.double())
+                states = '{},{},{},{},{}'.format(self.vessel.x,
+                                                 self.vessel.y,
+                                                 self.vessel.speed,
+                                                 self.vessel.heading,
+                                                 self.vessel.rot)
+                self.notify('VESSEL_STATE', states, -1)
+        finally:
+            self.lock.release()
         return True
 
 
 
 def main():
-    vessel = Vessel(0, -20, 0, 180, 1, 0.1, 180, -180)
-    pinger = MoosPub('localhost', 9000)
+    time.sleep(1)
+    vesselMoos = VesselMoosPub('localhost', 9000)
+    # all the states in one message to make sure everything arrives at the mpc
+    states = '{},{},{},{},{}'.format(vesselMoos.vessel.x,
+                                     vesselMoos.vessel.y,
+                                     vesselMoos.vessel.speed,
+                                     vesselMoos.vessel.heading,
+                                     vesselMoos.vessel.rot)
+    time.sleep(1)
+    print('notifying...')
+    vesselMoos.notify('VESSEL_STATE', states, -1);
 
     while True:
         time.sleep(0.1)
-        vessel.simulate(0)
-        pinger.notify('NAV_X', vessel.x, -1);
-        pinger.notify('NAV_Y', vessel.y, -1);
-        pinger.notify('NAV_SPEED', vessel.speed, -1);
+        vesselMoos.lock.acquire()
+        try:
+            vesselMoos.notify('NAV_X', vesselMoos.vessel.x, -1);
+            vesselMoos.notify('NAV_Y', vesselMoos.vessel.y, -1);
+            vesselMoos.notify('NAV_SPEED', vesselMoos.vessel.speed, -1);
+            vesselMoos.notify('NAV_HEADING', vesselMoos.vessel.heading, -1);
+            # depth used in marine viewer to check the rot
+            vesselMoos.notify('NAV_DEPTH', vesselMoos.vessel.rot, -1);
+        finally:
+            vesselMoos.lock.release()
 
-        pinger.notify('NAV_HEADING', vessel.heading, -1);
+
+
+
+
+
 
 if __name__ == "__main__":
     main()

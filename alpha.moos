@@ -25,10 +25,10 @@ ProcessConfig = ANTLER
 
   Run = MOOSDB          @ NewConsole = false
   // Run = pLogger         @ NewConsole = false
-  //Run = pMarineViewer   @ NewConsole = false, ExtraProcessParams=one
+  Run = pMarineViewer   @ NewConsole = false, ExtraProcessParams=one
   //Run = uProcessWatch   @ NewConsole = false
-  //Run = pNodeReporter   @ NewConsole = false
-  Run = ./mpc.py       @ NewConsole = false
+  Run = pNodeReporter   @ NewConsole = false
+  Run = ./mpcMOOS.py       @ NewConsole = false
 
   //Run = ./plotter.py    @ NewConsole = false
   Run = ./path_publisher.py       @ NewConsole = false
@@ -44,7 +44,7 @@ ProcessConfig = plotter.py
 {
 }
 
-ProcessConfig = mpc.py
+ProcessConfig = mpcMOOS.py
 {
 }
 
@@ -105,10 +105,10 @@ ProcessConfig = pMarineViewer
 
   tiff_file            = forrest19.tif
 
-  set_pan_x            = -90
-  set_pan_y            = -280
-  zoom                 = 0.65
-  vehicle_shape_scale  = 1.5
+  set_pan_x            = 800
+  set_pan_y            = 6000
+  zoom                 = 0.04
+  vehicle_shape_scale  = 50
   hash_delta           = 50
   hash_shade           = 0.4
   hash_viewable        = true

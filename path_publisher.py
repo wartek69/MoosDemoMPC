@@ -22,7 +22,7 @@ class pingMOOS(pymoos.comms):
         self.register('PATH_Y', 0)
         return True
 
-def create_path(length):
+def create_path_small(length):
     px = []
     py = []
     #x = [0, 500, 2000, 4000, 6000]
@@ -30,6 +30,17 @@ def create_path(length):
     x = [0, 20, 80, 100, 200]
     y = [-100, -80, -60, -80, -100]
 
+    cs = CubicSpline(x, y)
+    for k in range(length):
+        px.append(k)
+        py.append(cs(k))
+    return px, py
+
+def create_path(length):
+    px = []
+    py = []
+    x = [0, 500, 2000, 4000, 6000]
+    y = [-1500, -800, -1800, 2000, -500]
     cs = CubicSpline(x, y)
     for k in range(length):
         px.append(k)
@@ -44,7 +55,7 @@ def main():
     pinger.notify('PATH_X', str(px), -1)
     pinger.notify('PATH_Y', str(py), -1)
     j = 0;
-    while j < 10:
+    while j < 20:
         time.sleep(1)
 
         j = j + 1
