@@ -28,10 +28,11 @@ ProcessConfig = ANTLER
   Run = pMarineViewer   @ NewConsole = false, ExtraProcessParams=one
   //Run = uProcessWatch   @ NewConsole = false
   Run = pNodeReporter   @ NewConsole = false
+  Run = ./path_publisher.py       @ NewConsole = false
   Run = ./mpcMOOS.py       @ NewConsole = false
 
   //Run = ./plotter.py    @ NewConsole = false
-  Run = ./path_publisher.py       @ NewConsole = false
+
   Run = ./vessel_sim.py @ NewConsole = false
 
 

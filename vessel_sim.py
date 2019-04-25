@@ -98,7 +98,7 @@ def main():
                                      vesselMoos.vessel.speed,
                                      vesselMoos.vessel.heading,
                                      vesselMoos.vessel.rot)
-    time.sleep(1)
+    time.sleep(2)
     print('notifying...')
     vesselMoos.notify('VESSEL_STATE', states, -1);
 
