@@ -46,6 +46,13 @@ class Vessel():
         else:
             self.rot = self.rot
 
+    def simulate_var_rotdot(self, rotdot, delta_t = 1):
+        self.x = self.x + math.sin(self.heading / 180 * math.pi) * self.speed * delta_t
+        self.y = self.y + math.cos(self.heading / 180 * math.pi) * self.speed * delta_t
+        self.heading = (self.heading + self.rot / secondsPerMin * delta_t) % 360
+        self.rot = self.rot + rotdot * delta_t
+        
+
 class VesselMoosPub(pymoos.comms):
     def __init__(self, moos_community, moos_port):
         """Initiates MOOSComms, sets the callbacks and runs the loop"""

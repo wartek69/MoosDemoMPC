@@ -13,7 +13,7 @@ from keras.engine.saving import load_model
 from vessel_sim import Vessel
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
-rotdot = True;
+rotdot = True
 
 
 class MPC:
@@ -29,9 +29,33 @@ class MPC:
     rot2_dot = 1
     prediction_horizon = 120
     heading_weight = 5
+    ready = False
 
     def __init__(self):
-        pass
+        if rotdot:
+            print('entered rotdot in mpc constructor')
+            input_shape_mlp = 2
+            self.scaler = MinMaxScaler(feature_range=(-1, 1))
+            self.MLP_model = load_model('model/mlp_model_rotdot_10k_1000ep_2hidden.h5')
+            #necessary, else there is an error when predicting because of a bug with multithreading and keras
+            self.MLP_model._make_predict_function()
+            # determine scaling factor
+            dataset = np.loadtxt("generated_data/random_rot_dot/training_less_random_10k.data", delimiter=";", comments='#')
+            print('loaded all files')
+            x_train = dataset[:, 0:input_shape_mlp]
+            self.scaler.fit_transform(x_train)
+        else:
+            input_shape_mlp = 3
+            self.scaler = MinMaxScaler(feature_range=(-1, 1))
+            self.MLP_model = load_model('model/mlp_model_eenvoudiger_200k_100ep.h5')
+            #necessary, else there is an error when predicting because of a bug with multithreading and keras
+            self.MLP_model._make_predict_function()
+            #determine scaling factor
+            dataset = np.loadtxt("generated_data/random/training_less_random_200k.data", delimiter=";", comments='#')
+            print('loaded all files')
+            x_train = dataset[:, 0:input_shape_mlp]
+            self.scaler.fit_transform(x_train)
+        self.ready = True
 
     #optimization done by either increasing or decreasing the rot
     def optimize_simple(self, px, py, vessel_model):
@@ -62,6 +86,7 @@ class MPC:
         print(best_trans)
         return self.__get_rot(best_rot, vessel_model.rot)
 
+    #By batching the input for predictions the performance strongly improves
     def optimize_simple_MLP_batch(self, px, py, vessel_model):
         # do not edit the original vessel object!
         model = copy.copy(vessel_model)
@@ -94,8 +119,10 @@ class MPC:
                     prediction_input[index, 2] = self.__get_rot(control_action[1], vessels[index][2])
 
             prediction_input_scaled = self.scaler.transform(prediction_input)
-            prediction_output = self.MLP_model.predict(prediction_input_scaled)
-
+            try:
+                prediction_output = self.MLP_model.predict(prediction_input_scaled)
+            except Exception as e:
+                print(e)
             # update all the vessels simultaneously
             for index, vessel in enumerate(vessels):
                 predicted_x = prediction_output[index, 0]
@@ -210,6 +237,7 @@ class MPC:
     def optimize_simple_MLP_rotdot_batch(self, px, py, vessel_model):
         # do not edit the original vessel object!
         model = copy.copy(vessel_model)
+        #print('copied model')
         # we will have multiple vessel that sail simultaneously to test all the possibilities
         vessels = []
         control_inputs = []
@@ -224,7 +252,6 @@ class MPC:
                     vessels.append(copy.copy(model))
         # prepare the prediction input matrix
         prediction_input = np.zeros((len(control_inputs), 2))
-
         # the actual predictions
         for t in range(self.prediction_horizon):
             for index, control_action in enumerate(control_inputs):
@@ -235,9 +262,11 @@ class MPC:
                 else:
                     prediction_input[index, 0] = vessels[index].rot;
                     prediction_input[index, 1] = self.__get_rot(control_action[1], vessels[index].rot)
-
             prediction_input_scaled = self.scaler.transform(prediction_input)
-            prediction_output = self.MLP_model.predict(prediction_input_scaled)
+            try:
+                prediction_output = self.MLP_model.predict(prediction_input_scaled)
+            except Exception as e:
+                print(e)
 
             # let the vessel sail simultaneously
             for index, vessel in enumerate(vessels):

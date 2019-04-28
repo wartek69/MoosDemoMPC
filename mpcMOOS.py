@@ -27,9 +27,10 @@ class mpcMOOS(pymoos.comms):
 
         self.add_active_queue('control_queue', self.on_vessel_state)
         self.add_message_route_to_active_queue('control_queue', 'VESSEL_STATE')
-        self.x = []
-        self.y = []
-
+        self.path_x = []
+        self.path_y = []
+        self.mpc = MPC()
+        print('MPC created')
 
         self.run(self.server, self.port, self.name)
 
@@ -80,12 +81,15 @@ class mpcMOOS(pymoos.comms):
         return True
 
     def on_vessel_state(self, msg):
+        while(len(self.path_x) == 0 or len(self.path_y) == 0):
+            # wait till there is a path present
+            time.sleep(0.5)
         self.lock.acquire()
         try:
             if msg.key() == 'VESSEL_STATE':
                 states = msg.string().split(',')
+                print('states received')
                 print(states)
-                mpc = MPC()
                 vessel = Vessel(float(states[0]),
                                 float(states[1]),
                                 float(states[4]),
@@ -101,12 +105,15 @@ class mpcMOOS(pymoos.comms):
                 start = time.time()
                 print('size pathx: {}'.format(len(self.path_x)))
                 print('size pathy: {}'.format(len(self.path_y)))
-                rrot = mpc.optimize_simple(self.path_x, self.path_y, vessel)
+                print(self.mpc.ready)
+                rrot = self.mpc.optimize_simple(self.path_x, self.path_y, vessel)
 
                 stop = time.time()
                 print("elapsed time: {}".format(stop-start))
                 elapsed_time.append(stop-start)
                 self.notify('RROT', rrot, -1)
+        except Exception as e:
+            print(e)
         finally:
             self.lock.release()
         return True
