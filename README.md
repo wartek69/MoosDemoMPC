@@ -2,6 +2,21 @@
 A MPC controller integrated into MOOS-IVP.
 The steering is done using a rate-of-turn (ROT) and not the rudder angle!
 
+# Overview
+![overview of architecture](img/moos_architecture.png)
+
+As can be seen on the figure above the MPC is integrated with the MOOS-DB.
+The red blocks are own work.
+The green blocks are situational and can be programmed pretty easily such that the vessel simulator will take environment into consideration.
+The blue blocks are used from the moos-ivp (http://oceanai.mit.edu/moos-ivp/pmwiki/pmwiki.php?n=Main.HomePage) modules.
+
+# Getting started
+First it is necessary to install MOOS-DB onto your system. This can be done by downloading the source from he following link: http://oceanai.mit.edu/moos-ivp/pmwiki/pmwiki.php?n=Site.Download.
+The source contains a readme with the steps necessary to get a working MOOS-DB.
+When that's done this project can be started using ```pAntler alpha.moos```.
+NOTE: Make sure to install the necessary packages using the pip install command!
+
+
 # Models
 The mpc can make use of three different models.
 A rotdot model, a blackbox model and a mathematical model.
