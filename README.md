@@ -13,7 +13,7 @@ The blue blocks are used from the moos-ivp (http://oceanai.mit.edu/moos-ivp/pmwi
 # Getting started
 First it is necessary to install MOOS-DB onto your system. This can be done by downloading the source from he following link: http://oceanai.mit.edu/moos-ivp/pmwiki/pmwiki.php?n=Site.Download.
 The source contains a readme with the steps necessary to get a working MOOS-DB.
-When that's done this project can be started using ```pAntler alpha.moos```.
+When that's done this project can be started using ```pAntler mpc.moos```.
 NOTE: Make sure to install the necessary packages using the pip install command!
 
 
